@@ -201,7 +201,109 @@ function faceletsToPattern(facelets: string): KPattern {
 
 }
 
+function log(message: any) {
+  let msg = message.replace("\n", "</br>")
+  let old = $("#logs").html()
+  let currentdate = new Date(); 
+  let datetime = "[" 
+                + currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds() 
+                + "]";
+  $("#logs").html(datetime + msg + "</br>" + old)
+}
+
+let oll_algs = [
+  { name: 'sune', alg: "R U R' U R U2' R'" },
+  { name: 'anti-sune', alg: "R U2 R' U' R U' R'" },
+  { name: 'cross', alg: "y R U R' U R U' R' U R U2' R'" },
+  { name: 'bruno', alg: "R U2' R2' U' R2 U' R2' U2' R" },
+  { name: 'chameleon', alg: "r U R' U' r' F R F'" },
+  { name: 'headlights', alg: "R2 D R' U2 R D' R' U2 R'" },
+  { name: 'bowtie', alg: "F' r U R' U' r' F R" },
+  { name: 'T', alg: "F R U R' U' F'" },
+  { name: 'key', alg: "R U R' U' R' F R F'" },
+  { name: 'righty-square', alg: "r U2 R' U' R U' r'" },
+  { name: 'lefty-square', alg: "r' U2' R U R' U r" },
+  { name: 'arrow', alg: "r U R' U' M U R U' R'" },
+  { name: 'H', alg: "R U R' U' M' U R U' r'" },
+  { name: 'lightning', alg: "r U R' U R U2' r'" },
+  { name: 'reverse lightning', alg: "r' U' R U' R' U2 r" },
+  { name: 'downstairs', alg: "r' R2 U R' U R U2 R' U M'" },
+  { name: 'upstairs', alg: "M' R' U' R U' R' U2 R U' M" },
+  { name: 'big lightning', alg: "R' F R U R' U' F' U R" },
+  { name: 'lefty big lightning', alg: "L F' L' U' L U F U' L'" },
+  { name: 'P', alg: "f R U R' U' f'" },
+  { name: 'inverse P', alg: "f' L' U' L U f" },
+  { name: 'couch', alg: "R' U' F U R U' R' F' R" },
+  { name: 'anti-couch', alg: "S R U R' U' R' F R f'" },
+  { name: 'seein headlights', alg: "R' U' R' F R F' U R" },
+  { name: 'city', alg: "R U R' U' B' R' F R F' B" },
+  { name: 'mounted fish', alg: "F R U' R' U' R U R' F'" },
+  { name: 'fish salad', alg: "R U2' R2' F R F' R U2' R'" },
+  { name: 'anti-kite', alg: "R U R' U R' F R F' R U2' R'" },
+  { name: 'kite', alg: "R U R' U' R' F R2 U R' U' F'" },
+  { name: 'breakneck', alg: "F R U R' U' R U R' U' F'" },
+  { name: 'anti-breakneck', alg: "R' U' R' F R F' R' F R F' U R" },
+  { name: 'anti-frying pan', alg: "r U R' U R U' R' U R U2' r'" },
+  { name: 'frying pan', alg: "r' U' R U' R' U R U' R' U2 r" },
+  { name: 'back squeezy', alg: "r U' r2' U r2 U r2' U' r" },
+  { name: 'front squeezy', alg: "r' U r2 U' r2' U' r2 U r'" },
+  { name: 'ant', alg: "f R U R' U' R U R' U' f'" },
+  { name: 'streetlights', alg: "r U r' U R U' R' U R U' R' r U' r'" },
+  { name: 'highway', alg: "R U2 R2 U' R U' R' U2 F R F'" },
+  { name: 'rice cooker', alg: "R U R' U R U' y R U' R' F'" },
+  { name: 'mario', alg: "R U R' U R U' R' U' R' F R F'" },
+  { name: 'wario', alg: "R' U' R U' R' U R U l U' R' U x" },
+  { name: 'anti-squeegee', alg: "r U r' R U R' U' r U' r'" },
+  { name: 'squeegee', alg: "r' U' r R' U' R U r' U r" },
+  { name: 'anti-gun', alg: "R' F R U R' F' R F U' F'" },
+  { name: 'gun', alg: "F U R U' R2' F' R U R U' R'" },
+  { name: 'poodle', alg: "R U R' U R U2' R' F R U R' U' F'" },
+  { name: 'wtf', alg: "r2 D' r U r' D r2 U' r' U' r" },
+  { name: 'anti-wtf', alg: "F U R U2 R' U' R U2 R' U' F'" },
+  { name: 'anti-poodle', alg: "R' U' R U' R' U2 R F R U R' U' F'" },
+  { name: 'blank', alg: "R U2' R2' F R F' U2' R' F R F'" },
+  { name: 'zamboni', alg: "F R U R' U' F' f R U R' U' f'" },
+  { name: 'slash', alg: "R U R' U R' F R F' U2' R' F R F'" },
+  { name: 'bunny', alg: "M U R U R' U' M' R' F R F'" },
+  { name: 'anti-nazi', alg: "f R U R' U' f' U' F R U R' U' F'" },
+  { name: 'X', alg: "M U R U R' U' M2' U R U' r'" },
+  { name: 'crown', alg: "r U R' U R U2 r' r' U' R U' R' U2 r" },
+  { name: 'nazi', alg: "f R U R' U' f' U F R U R' U' F'" }
+];
+
+let pll_algs = [
+  {name: "Ua", alg: "R' U R' U' R' U' R' U R U R2"},
+  {name: "Ub", alg: "R2 U' R' U' R U R U R U' R"},
+  {name: "Aa", alg: "x R' U R' D2 R U' R' D2 R2 x'"},
+  {name: "Ab", alg: "x R2' D2 R U R' D2 R U' R x'"},
+  {name: "H", alg: "M2 U M2 U2 M2 U M2"},
+  {name: "Z", alg: "M2 U M2 U M' U2 M2 U2 M'"},
+  {name: "T", alg: "R U R' U' R' F R2 U' R' U' R U R' F'"},
+  {name: "F", alg: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R"},
+  {name: "Y", alg: "F R U' R' U' R U R' F' R U R' U' R' F R F'"},
+  {name: "E", alg: "x' R U' R' D R U R' D' R U R' D R U' R' D' x"},
+  {name: "V", alg: "R' U R' Dw' R' F' R2 U' R' U R' F R F"},
+  {name: "Ra", alg: "R U' R' U' R U R D R' U' R D' R' U2 R' U'"},
+  {name: "Rb", alg: "R' U2 R U2 R' F R U R' U' R' F' R2 U'"},
+  {name: "Ja", alg: "x R2 F R F' R U2 Rw' U Rw U2 x'"},
+  {name: "Jb", alg: "R U R' F' R U R' U' R' F R2 U' R' U'"},
+  {name: "Na", alg: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'"},
+  {name: "Nb", alg: "R' U R U' R' F' U' F R U R' F R' F' R U' R"},
+  {name: "Ga", alg: "R2 Uw R' U R' U' R Uw' R2 y' R' U R"},
+  {name: "Gb", alg: "R' U' R U D' R2 U R' U R U' R U' R2 D U'"},
+  {name: "Gc", alg: "R2 U' R U' R U R' U R2 D' U R U' R' D U'"},
+  {name: "Gd", alg: "R U R' y' R2 Uw' R U' R' U R' Uw R2"},
+]
+
 export {
   patternToFacelets,
-  faceletsToPattern
+  faceletsToPattern,
+  log,
+  oll_algs,
+  pll_algs
 }

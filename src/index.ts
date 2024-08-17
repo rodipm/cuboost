@@ -2,12 +2,12 @@
 import './style.css'
 
 import $ from 'jquery';
-import { Subscription, interval } from 'rxjs';
+import * as THREE from 'three';
+import { Subscription, interval, sample } from 'rxjs';
 import { TwistyPlayer } from 'cubing/twisty';
 import { experimentalSolve3x3x3IgnoringCenters } from 'cubing/search';
-
-import * as THREE from 'three';
-
+import { Alg } from 'cubing/alg';
+import { faceletsToPattern, patternToFacelets , log, oll_algs, pll_algs } from './utils';
 import {
   now,
   connectGanCube,
@@ -20,7 +20,6 @@ import {
   cubeTimestampLinearFit
 } from 'gan-web-bluetooth';
 
-import { faceletsToPattern, patternToFacelets } from './utils';
 
 const SOLVED_STATE = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
@@ -44,6 +43,8 @@ $('#cube').append(twistyPlayer);
 var conn: GanCubeConnection | null;
 var lastMoves: GanCubeMove[] = [];
 var solutionMoves: GanCubeMove[] = [];
+
+let currentAlg: string | null = null
 
 var twistyScene: THREE.Scene;
 var twistyVantage: any;
@@ -82,7 +83,10 @@ async function handleGyroEvent(event: GanCubeEvent) {
 }
 
 async function handleMoveEvent(event: GanCubeEvent) {
+  log("handleMoveEvent")
+
   if (event.type == "MOVE") {
+    log(event.move)
     if (timerState == "READY") {
       setTimerState("RUNNING");
     }
@@ -90,21 +94,33 @@ async function handleMoveEvent(event: GanCubeEvent) {
     lastMoves.push(event);
     if (timerState == "RUNNING") {
       solutionMoves.push(event);
+      checkMove(event.move)
     }
     if (lastMoves.length > 256) {
       lastMoves = lastMoves.slice(-256);
     }
-    if (lastMoves.length > 10) {
-      var skew = cubeTimestampCalcSkew(lastMoves);
-      $('#skew').val(skew + '%');
-    }
   }
+}
+
+function checkMove(move: string) {
+  if (currentAlg == null)
+    return
+  let currentAlgMoves = currentAlg.split(" ")
+  let solveMoveId = lastMoves.length
+  
+  if (move != currentAlgMoves[solveMoveId] || lastMoves.length == currentAlgMoves.length) {
+    lastMoves = []
+  }
+
+  colorizeText('alg-trainer')
 }
 
 var cubeStateInitialized = false;
 
 async function handleFaceletsEvent(event: GanCubeEvent) {
   if (event.type == "FACELETS" && !cubeStateInitialized) {
+    log("handleFaceletsEvent")
+    log(event.facelets)
     if (event.facelets != SOLVED_STATE) {
       var kpattern = faceletsToPattern(event.facelets);
       var solution = await experimentalSolve3x3x3IgnoringCenters(kpattern);
@@ -126,11 +142,6 @@ function handleCubeEvent(event: GanCubeEvent) {
     handleMoveEvent(event);
   } else if (event.type == "FACELETS") {
     handleFaceletsEvent(event);
-  } else if (event.type == "HARDWARE") {
-    $('#hardwareName').val(event.hardwareName);
-    $('#hardwareVersion').val(event.hardwareVersion);
-    $('#softwareVersion').val(event.softwareVersion);
-    $('#gyroSupported').val(event.gyroSupported ? "YES" : "NO");
   } else if (event.type == "BATTERY") {
     $('#batteryLevel').val(event.batteryLevel + '%');
   } else if (event.type == "DISCONNECT") {
@@ -168,8 +179,6 @@ $('#connect').on('click', async () => {
     await conn.sendCubeCommand({ type: "REQUEST_HARDWARE" });
     await conn.sendCubeCommand({ type: "REQUEST_BATTERY" });
     await conn.sendCubeCommand({ type: "REQUEST_FACELETS" });
-    $('#deviceName').val(conn.deviceName);
-    $('#deviceMAC').val(conn.deviceMAC);
     $('#connect').html('Disconnect');
   }
 });
@@ -249,3 +258,59 @@ $(document).on('keydown', (event) => {
 $("#cube").on('touchstart', () => {
   activateTimer();
 });
+
+
+// Function to dynamically populate the dropdown menu
+function populateDropdown(id, items: any[]) {
+  const dropdownContent = document.getElementById(id);
+  dropdownContent.innerHTML = '';  // Clear previous content
+
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.textContent = item.name;
+    div.dataset.id = item.name;  // Store item ID for reference
+
+    // Add a click event listener to each dropdown item
+    div.addEventListener('click', () => handleItemClick(item.name, item.alg));
+
+    dropdownContent.appendChild(div);
+  });
+}
+
+function handleItemClick(name, alg) {
+  currentAlg = alg
+  $('#alg-trainer').html(alg)
+  twistyPlayer.alg = new Alg(currentAlg).invert()
+  colorizeText('alg-trainer');
+}
+
+
+function colorizeText(elementId) {
+  const element = document.getElementById(elementId);
+  const text = element.textContent;
+  const letters = text.split(' ');  // Split text into individual characters
+  
+  element.innerHTML = '';  // Clear original content
+  
+  let currentMoveIndex = lastMoves.length
+  letters.forEach((letter, index) => {
+    const span = document.createElement('span');
+
+    if (index == currentMoveIndex)
+      span.className = "currentMove"
+    else if (index < currentMoveIndex)
+      span.className = "correctMove"
+    else if (index > currentMoveIndex)
+      span.className = "futureMove"
+    span.textContent = letter + " ";
+    
+    // Assign a color based on index or other logic (rotating through colors)
+    // span.style.color = colors[index % colors.length];
+    
+    element.appendChild(span);
+  });
+}
+
+// Populate the dropdown when the page loads
+populateDropdown("dropdown-content-OLL", oll_algs);
+populateDropdown("dropdown-content-PLL", pll_algs);

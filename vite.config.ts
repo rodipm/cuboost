@@ -1,9 +1,18 @@
 
 import { defineConfig } from 'vite'
+import mkcert from 'vite-plugin-mkcert'
+import Terminal from 'vite-plugin-terminal'
 
 const workerImportMetaUrlRE = /\bnew\s+(?:Worker|SharedWorker)\s*\(\s*(new\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/g;
 
 export default defineConfig({
+    server: {https: true},
+    plugins: [ 
+        mkcert(),
+        Terminal({
+            output: ['terminal', 'console']
+          })
+     ],
     base: "/cuboost",
     worker: {
         format: 'es',
