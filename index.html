@@ -1,69 +1,70 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CuBoost</title>
+    <script type="module" crossorigin src="/cuboost/assets/index-B8MEcJG9.js"></script>
+    <link rel="stylesheet" crossorigin href="/cuboost/assets/index-xZcHWF0i.css">
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gan-cube-sample</title>
-  <script type="module" crossorigin src="/cuboost/assets/index-DAU512Br.js"></script>
-  <link rel="stylesheet" crossorigin href="/cuboost/assets/index-CJLoQAjR.css">
-</head>
+  <body>
+    <div id="app">
+      <div class="left-panel">
+        <div class="info">
+          <label for="batteryLevel">Battery</label>
+          <input id="batteryLevel" type="text" readonly value="- n/a -" />
+          <label for="quaternion">Quat</label>
+          <input id="quaternion" type="text" readonly value="- n/a -" />
+          <label for="dot">Dot</label>
+          <input id="dot" type="text" readonly value="- n/a -" />
+          <label for="front">front</label>
+          <input id="front" type="text" readonly value="- n/a -" />
+          <label for="back">back</label>
+          <input id="back" type="text" readonly value="- n/a -" />
+          <label for="right">right</label>
+          <input id="right" type="text" readonly value="- n/a -" />
+          <label for="left">left</label>
+          <input id="left" type="text" readonly value="- n/a -" />
+          <label for="top">top</label>
+          <input id="top" type="text" readonly value="- n/a -" />
+          <label for="bottom">bottom</label>
+          <input id="bottom" type="text" readonly value="- n/a -" />
+        </div>
 
-<body>
+        <div class="controls">
+          <button id="connect">Connect</button>
+          <button id="reset-state">Reset State</button>
+          <button id="reset-gyro">Reset Gyro</button>
+        </div>
 
-  <div id="app">
+        <div class="dropdown">
+          <button class="dropdown-btn">OLL Cases</button>
+          <div class="dropdown-content" id="dropdown-content-OLL">
+            <!-- Dynamic content will be inserted here -->
+          </div>
+        </div>
 
-    <div id="cube"></div>
+        <div class="dropdown">
+          <button class="dropdown-btn">PLL cases</button>
+          <div class="dropdown-content" id="dropdown-content-PLL">
+            <!-- Dynamic content will be inserted here -->
+          </div>
+        </div>
+      </div>
 
-    <div class="help">
-      Scramble cube to arbitrary state then press SPACE or touch Cube
-      to activate basic solving timer
+      <div class="main">
+        <div id="cube"></div>
+        
+        <div id="timer">0:00.000</div>
+        
+        <div id="alg-container">
+          <div id="alg-name">Choose an alg</div>
+          <div id="alg-display"></div>
+          <div id="alg-display-wrong"></div>
+        </div>
+      </div>
     </div>
-
-    <div class="info">
-
-      <label for="deviceName">Device Name</label>
-      <input id="deviceName" type="text" readonly value="- n/a -">
-
-      <label for="deviceMAC">Device MAC</label>
-      <input id="deviceMAC" type="text" readonly value="- n/a -">
-
-      <label for="hardwareName">Hardware Name</label>
-      <input id="hardwareName" type="text" readonly value="- n/a -">
-
-      <label for="hardwareVersion">Hardware Version</label>
-      <input id="hardwareVersion" type="text" readonly value="- n/a -">
-
-      <label for="softwareVersion">Software Version</label>
-      <input id="softwareVersion" type="text" readonly value="- n/a -">
-
-      <label for="gyroSupported">Gyro Supported</label>
-      <input id="gyroSupported" type="text" readonly value="- n/a -">
-
-      <label for="batteryLevel">Battery</label>
-      <input id="batteryLevel" type="text" readonly value="- n/a -">
-
-      <label for="skew">Clock Skew</label>
-      <input id="skew" type="text" readonly value="- n/a -">
-
-      <label for="quaternion">Quaternion</label>
-      <input id="quaternion" type="text" readonly value="- n/a -">
-
-      <label for="velocity">Angular Velocity</label>
-      <input id="velocity" type="text" readonly value="- n/a -">
-
-    </div>
-
-    <div class="controls">
-      <button id="connect">Connect</button>
-      <button id="reset-state">Reset State</button>
-      <button id="reset-gyro">Reset Gyro</button>
-    </div>
-
-    <div id="timer">0:00.000</div>
-
-  </div>
-
-</body>
-
+    <div id="logs"></div>
+  </body>
 </html>
