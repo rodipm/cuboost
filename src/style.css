@@ -1,5 +1,6 @@
 body {
   width: 100vw;
+  height: 100vh;
   margin: 0;
   background-color: #666;
   font-family: Arial, Helvetica, sans-serif;
@@ -14,13 +15,26 @@ body {
   justify-content: space-between;
 }
 
+
 .main {
   width: 100%;
+  height: 100vh;
+  grid-row-end: unset;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 10em;
+}
+
+.main-top {
+  width: 100%;
+  max-height: 85%;
+  height: 85%;
+  grid-row-end: unset;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #cube {
@@ -31,6 +45,12 @@ body {
 #cube twisty-player {
   width: 15em;
   height: 15em;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .controls button {
@@ -46,7 +66,7 @@ body {
 
 .info {
   display: grid;
-  grid-template-columns: 5em 15em;
+  grid-template-columns: 2em 10em;
   margin: 1em 0em 1em 0em;
 }
 
@@ -90,9 +110,10 @@ body {
   z-index: 10;
   font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
+  margin-bottom: 15px;
 }
 
-#alg-trainer {
+#alg-display {
   font-size: 2em;
   top: 8.2em;
   left: 0.8em;
@@ -106,6 +127,24 @@ body {
   z-index: 10;
   font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
+  display: none;
+}
+
+#alg-display-wrong {
+  font-size: 2em;
+  top: 8.2em;
+  left: 0.8em;
+  width: auto;
+  padding: 1em;
+  border: 1px solid rgb(253, 23, 23);
+  border-radius: 1em;
+  background-color: rgb(247, 114, 114);
+  color: white;
+  text-align: center;
+  z-index: 10;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  display: none;
 }
 
 .help {
@@ -139,6 +178,8 @@ body {
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   min-width: 160px;
   z-index: 1;
+  overflow-y: scroll;
+  max-height: 300px;
 }
 
 /* Links inside the dropdown */
@@ -169,6 +210,7 @@ body {
 .currentMove {
   background-color: #3498db;
   border-radius: 1000px;
+  padding-left: 20px;
   width: auto;
   height: auto;
 }
@@ -179,4 +221,30 @@ body {
 
 .futureMove {
   color: white;
+}
+
+#alg-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px
+}
+
+#alg-name {
+  text-align: center;
+  color: #3498db;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 3em;
+  font-weight: bolder;
+}
+
+#alg-solutions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: scroll;
+  max-height: 20px;
+  margin-top: 30px;
+  height: 20%;
+  max-height: 20%;
 }
