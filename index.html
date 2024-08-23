@@ -1,77 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CuBoost</title>
-    <script type="module" crossorigin src="/cuboost/assets/index-geJ5E9sf.js"></script>
-    <link rel="stylesheet" crossorigin href="/cuboost/assets/index-f0nLqM42.css">
-  </head>
-
-  <body>
-    <div id="app">
-      <div class="left-panel">
-        <div class="info">
-          <label for="batteryLevel">Battery</label>
-          <input id="batteryLevel" type="text" readonly value="- n/a -" />
-          <label for="quaternion">Quat</label>
-          <input id="quaternion" type="text" readonly value="- n/a -" />
-          <label for="dot">Dot</label>
-          <input id="dot" type="text" readonly value="- n/a -" />
-          <label for="front">front</label>
-          <input id="front" type="text" readonly value="- n/a -" />
-          <label for="back">back</label>
-          <input id="back" type="text" readonly value="- n/a -" />
-          <label for="right">right</label>
-          <input id="right" type="text" readonly value="- n/a -" />
-          <label for="left">left</label>
-          <input id="left" type="text" readonly value="- n/a -" />
-          <label for="top">top</label>
-          <input id="top" type="text" readonly value="- n/a -" />
-          <label for="bottom">bottom</label>
-          <input id="bottom" type="text" readonly value="- n/a -" />
-        </div>
-
-        <div class="controls">
-          <button id="connect">Connect</button>
-          <button id="reset-state">Reset State</button>
-          <button id="reset-gyro">Reset Gyro</button>
-        </div>
-
-        <div class="dropdown">
-          <button class="dropdown-btn">OLL Cases</button>
-          <div class="dropdown-content" id="dropdown-content-OLL">
-            <!-- Dynamic content will be inserted here -->
-          </div>
-        </div>
-
-        <div class="dropdown">
-          <button class="dropdown-btn">PLL cases</button>
-          <div class="dropdown-content" id="dropdown-content-PLL">
-            <!-- Dynamic content will be inserted here -->
-          </div>
-        </div>
-      </div>
-
-      <div class="main">
-        <div class="main-top">
-          <div id="cube"></div>
-          
-          <div id="timer">0:00.000</div>
-          
-          <div id="alg-container">
-            <div id="alg-name">Choose an alg</div>
-            <div id="alg-display">
-              <div>a</div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuboost</title>
+    <link rel="stylesheet" href="style.css">
+  <script type="module" crossorigin src="/cuboost/assets/index-1TffcFJN.js"></script>
+  <link rel="stylesheet" crossorigin href="/cuboost/assets/index-Ch7INfJ1.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cuboost</h1>
+            <div class="control-panel">
+                <button id="connect-cube">Connect Cube</button>
+                <button id="sync-gyro">Sync Gyro</button>
+                <button id="reset-cube">Reset Cube</button>
+                <div class="battery-status">Battery: <span id="battery-level">100%</span></div>
             </div>
-            <div id="alg-display-wrong">
-              <div>a</div>
+        </header>
+
+        <div class="main-area">
+            <div class="left-panel">
+                <div class="cube-display">
+                    <div id="twisty-player"></div>
+                </div>
+                <div class="timer">
+                    <span id="timer">00:00.00</span>
+                </div>
             </div>
-            <div id="alg-solutions"></div>
-          </div>
+            <div class="right-panel">
+                <div class="current-alg">
+                    <h3 id="current-alg-name">Choose an alg...</h3>
+                    
+                    <!-- Algorithm Selection Container -->
+                    <div class="alg-selector">
+                        <!-- Algorithm Type Selector -->
+                        <div class="custom-select" id="alg-type-select">
+                            <div class="select-selected">Select Algorithm Type</div>
+                            <div class="select-items select-hide">
+                                <div data-value="oll">OLL</div>
+                                <div data-value="pll">PLL</div>
+                                <div data-value="custom">Custom</div>
+                            </div>
+                        </div>
+
+                        <!-- Algorithm Options Selector -->
+                        <div class="custom-select" id="alg-options-select" style="display:none;">
+                            <div class="select-selected">Select Algorithm</div>
+                            <div class="select-items select-hide">
+                                <!-- Options will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Custom Algorithm Input -->
+                        <input
+                            type="text"
+                            id="custom-alg-input"
+                            placeholder="Enter custom algorithm"
+                            style="display:none;"
+                        />
+                    </div>
+
+                    <div id="alg-steps">
+                        <!-- Steps will be dynamically populated -->
+                        <span class="step not-made">R</span>
+                        <span class="step not-made">U</span>
+                        <span class="step not-made">R'</span>
+                        <span class="step current-move">F</span>
+                    </div>
+                    <div class="wrong-move-container">
+                        <div id="wrong-move" class="wrong-move">Wrong move!</div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div class="solve-history">
+            <h3>Solve History</h3>
+            <div class="solve-history-content">
+                <div class="solve-stats">
+                    <p>Solves: <span id="solve-count">0</span></p>
+                    <p>Correct: <span id="correct-count">0</span></p>
+                    <p>Fastest: <span id="fastest-time">--:--</span></p>
+                    <p>Mean: <span id="mean-time">--:--</span></p>
+                    <p>Mistakes: <span id="mistake-count">0</span></p>
+                </div>
+                <div class="solve-list-container">
+                    <ul id="solves" class="solve-list">
+                        <!-- Solve records will be dynamically populated -->
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="logs"></div>
-  </body>
+
+    <script src="https://unpkg.com/@cubing/twisty-player@0.9.0"></script>
+</body>
 </html>
