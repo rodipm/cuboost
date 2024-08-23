@@ -120,3 +120,137 @@ document.getElementById("alg-select")?.addEventListener("change", (e: Event) => 
         twistyPlayer.alg = "R U R' F..."; // Replace with actual alg steps
     }
 });
+
+// Mock data for OLL and PLL algorithms
+const algs = {
+    oll: [
+        { name: "OLL 1", notation: "R U2 R' U' R U R' U' R U' R'" },
+        { name: "OLL 2", notation: "F R U R' U' F'" },
+        // Add more OLL algorithms as needed
+    ],
+    pll: [
+        { name: "PLL 1", notation: "R2 U R U R' U' R' U' R' U R'" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL 2", notation: "R U' R U R U R U' R' U' R2" },
+        { name: "PLL LAST", notation: "R U' R U R U R U' R' U' R2" },
+        // Add more PLL algorithms as needed
+    ],
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Initialize the custom selects
+    initCustomSelect("alg-type-select", handleAlgTypeChange);
+
+    // Handle custom algorithm input
+    const customAlgInput = document.getElementById("custom-alg-input") as HTMLInputElement;
+    customAlgInput.addEventListener("input", () => {
+        const notation = customAlgInput.value.trim();
+        displayAlgorithmSteps(notation);
+        document.getElementById("current-alg-name").textContent = "Current Algorithm: Custom";
+    });
+});
+
+function handleAlgTypeChange(value: string) {
+    const algOptionsSelect = document.getElementById("alg-options-select") as HTMLElement;
+    const customAlgInput = document.getElementById("custom-alg-input") as HTMLInputElement;
+    const algStepsContainer = document.getElementById("alg-steps") as HTMLElement;
+    const currentAlgName = document.getElementById("current-alg-name") as HTMLElement;
+
+    if (value === "custom") {
+        algOptionsSelect.style.display = "none";
+        customAlgInput.style.display = "block";
+        algStepsContainer.innerHTML = "";
+        currentAlgName.textContent = "Current Algorithm: Custom";
+    } else {
+        // Populate algorithm options
+        const optionsContainer = algOptionsSelect.querySelector(".select-items") as HTMLElement;
+        optionsContainer.innerHTML = "";
+        algs[value].forEach((alg) => {
+            const optionDiv = document.createElement("div");
+            optionDiv.textContent = alg.name;
+            optionDiv.dataset.notation = alg.notation;
+            optionsContainer.appendChild(optionDiv);
+        });
+
+        algOptionsSelect.style.display = "block";
+        customAlgInput.style.display = "none";
+        algStepsContainer.innerHTML = "";
+        currentAlgName.textContent = `Current Algorithm: ${value.toUpperCase()}`;
+
+        initCustomSelect("alg-options-select", handleAlgSelection);
+    }
+}
+
+function handleAlgSelection(algName: string, selectedDiv: HTMLElement) {
+    const notation = selectedDiv.dataset.notation;
+    displayAlgorithmSteps(notation);
+    document.getElementById("current-alg-name").textContent = `Current Algorithm: ${algName}`;
+}
+
+function initCustomSelect(elementId: string, onChange: (value: string, selectedDiv?: HTMLElement) => void) {
+    const select = document.getElementById(elementId);
+    const selected = select.querySelector(".select-selected") as HTMLElement;
+    const optionsContainer = select.querySelector(".select-items") as HTMLElement;
+    const mainArea = document.getElementsByClassName("main-area")[0] as HTMLElement;
+
+    selected.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeAllSelect(selected);
+        optionsContainer.classList.toggle("select-hide");
+        selected.classList.toggle("select-arrow-active");
+        mainArea.scrollTop = mainArea.scrollHeight;
+    });
+
+    optionsContainer.querySelectorAll("div").forEach((optionDiv) => {
+        optionDiv.addEventListener("click", (e) => {
+            const value = optionDiv.dataset.value || optionDiv.textContent;
+            selected.textContent = optionDiv.textContent;
+            onChange(value, optionDiv);
+            optionsContainer.classList.add("select-hide");
+            selected.classList.remove("select-arrow-active"); 
+        });
+    });
+}
+
+// Function to close all select boxes except the current one
+function closeAllSelect(current?: HTMLElement) {
+    const selects = document.querySelectorAll(".select-items");
+    const selecteds = document.querySelectorAll(".select-selected");
+    selects.forEach((select) => {
+        if (select !== current) {
+            select.classList.add("select-hide");
+        }
+    });
+    selecteds.forEach((selected) => {
+        if (selected !== current) {
+            selected.classList.remove("select-arrow-active");
+        }
+    });
+}
+
+// Close all selects when clicking outside
+document.addEventListener("click", closeAllSelect);
+
+// Function to display algorithm steps
+function displayAlgorithmSteps(notation: string) {
+    const algStepsContainer = document.getElementById("alg-steps") as HTMLElement;
+    algStepsContainer.innerHTML = "";
+    const moves = notation.split(" ");
+    moves.forEach((move, index) => {
+        const stepSpan = document.createElement("span");
+        stepSpan.textContent = move;
+        stepSpan.classList.add("step");
+        if (index === 0) {
+            stepSpan.classList.add("current-move");
+        } else {
+            stepSpan.classList.add("not-made");
+        }
+        algStepsContainer.appendChild(stepSpan);
+    });
+}

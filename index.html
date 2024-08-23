@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuboost</title>
+    <title>Rubik's Cube Algorithm Trainer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -30,24 +30,42 @@
             <div class="right-panel">
                 <div class="current-alg">
                     <h3 id="current-alg-name">Current Algorithm: OLL</h3>
+                    
+                    <!-- Algorithm Selection Container -->
+                    <div class="alg-selector">
+                        <!-- Algorithm Type Selector -->
+                        <div class="custom-select" id="alg-type-select">
+                            <div class="select-selected">Select Algorithm Type</div>
+                            <div class="select-items select-hide">
+                                <div data-value="oll">OLL</div>
+                                <div data-value="pll">PLL</div>
+                                <div data-value="custom">Custom</div>
+                            </div>
+                        </div>
+
+                        <!-- Algorithm Options Selector -->
+                        <div class="custom-select" id="alg-options-select" style="display:none;">
+                            <div class="select-selected">Select Algorithm</div>
+                            <div class="select-items select-hide">
+                                <!-- Options will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Custom Algorithm Input -->
+                        <input
+                            type="text"
+                            id="custom-alg-input"
+                            placeholder="Enter custom algorithm"
+                            style="display:none;"
+                        />
+                    </div>
+
                     <div id="alg-steps">
                         <!-- Steps will be dynamically populated -->
-                        <span class="step">R</span>
-                        <span class="step">r</span>
-                        <span class="step">M2</span>
-                        <span class="step">R2</span>
-                        <span class="step">U2'</span>
-                        <span class="step">R'</span>
-                        <span class="step">R</span>
-                        <span class="step">U</span>
-                        <span class="step current-move">R'</span>
                         <span class="step not-made">R</span>
                         <span class="step not-made">U</span>
                         <span class="step not-made">R'</span>
-                        <span class="step not-made">F</span>
-                    </div>
-                    <div class="wrong-move-container">
-                        <div id="wrong-move" class="wrong-move">Wrong move!</div>
+                        <span class="step current-move">F</span>
                     </div>
                 </div>
             </div>
