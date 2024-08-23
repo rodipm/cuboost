@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CuBoost</title>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="left-panel">
+        
+        <div class="info">
+          <label for="batteryLevel">Battery</label>
+          <input id="batteryLevel" type="text" readonly value="- n/a -" />
+          <label for="green-face">Green</label>
+          <input id="green-face" type="text" readonly value="- n/a -" />
+          <label for="blue-face">Blue</label>
+          <input id="blue-face" type="text" readonly value="- n/a -" />
+          <label for="red-face">Red</label>
+          <input id="red-face" type="text" readonly value="- n/a -" />
+          <label for="orange-face">Orange</label>
+          <input id="orange-face" type="text" readonly value="- n/a -" />
+          <label for="white-face">White</label>
+          <input id="white-face" type="text" readonly value="- n/a -" />
+          <label for="yellow-face">Yellow</label>
+          <input id="yellow-face" type="text" readonly value="- n/a -" />
+        </div>
+
+        <hr>
+
+        <div class="controls">
+          <button id="connect">Connect</button>
+          <button id="reset-state">Reset State</button>
+          <button id="reset-gyro">Reset Gyro</button>
+        </div>
+        <hr>
+        <div class="dropdown">
+          <button class="dropdown-btn">OLL Cases</button>
+          <div class="dropdown-content" id="dropdown-content-OLL">
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <button class="dropdown-btn">PLL cases</button>
+          <div class="dropdown-content" id="dropdown-content-PLL">
+          </div>
+        </div>
+      </div>
+
+      <div id="main">
+        <div id="main-top">
+          <div id="cube"></div>
+          
+          <div id="timer">0:00.000</div>
+          
+          <div id="alg-container">
+            <div id="alg-name">Choose an alg</div>
+            <div id="alg-display">
+              <div>a</div>
+            </div>
+            <div id="alg-display-wrong">
+              <div>a</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="alg-solutions"></div>
+    </div>
+    <script type="module" src="/src/index.ts"></script>
+  </body>
+</html>
