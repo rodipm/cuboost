@@ -3,52 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rubik's Cube Algorithm Trainer</title>
+    <title>Cuboost</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Rubik's Cube Algorithm Trainer</h1>
-            <div class="battery-status">Battery: <span id="battery-level">100%</span></div>
+            <h1>Cuboost</h1>
+            <div class="control-panel">
+                <button id="connect-cube">Connect Cube</button>
+                <button id="sync-gyro">Sync Gyro</button>
+                <button id="reset-cube">Reset Cube</button>
+                <div class="battery-status">Battery: <span id="battery-level">100%</span></div>
+            </div>
         </header>
 
-        <div class="control-panel">
-            <div class="connection-controls">
-                <button id="connect-cube">Connect Cube</button>
-                <button id="disconnect-cube">Disconnect Cube</button>
-                <button id="sync-gyro">Sync Gyro</button>
-                <button id="reset-cube">Reset Cube State</button>
-            </div>
-
-            <div class="alg-controls">
-                <select id="alg-select">
-                    <option value="oll">OLL</option>
-                    <option value="pll">PLL</option>
-                    <option value="custom">Custom</option>
-                </select>
-                <input type="text" id="custom-alg" placeholder="Enter custom algorithm">
-            </div>
-        </div>
-
         <div class="main-area">
-            <div class="cube-display">
-                <div id="twisty-player"></div>
+            <div class="left-panel">
+                <div class="cube-display">
+                    <div id="twisty-player"></div>
+                </div>
+                <div class="timer">
+                    <span id="timer">00:00.00</span>
+                </div>
+            </div>
+            <div class="right-panel">
                 <div class="current-alg">
                     <h3 id="current-alg-name">Current Algorithm: OLL</h3>
                     <div id="alg-steps">
                         <!-- Steps will be dynamically populated -->
+                        <span class="step">R</span>
+                        <span class="step">r</span>
+                        <span class="step">M2</span>
+                        <span class="step">R2</span>
+                        <span class="step">U2'</span>
+                        <span class="step">R'</span>
+                        <span class="step">R</span>
+                        <span class="step">U</span>
+                        <span class="step current-move">R'</span>
                         <span class="step not-made">R</span>
                         <span class="step not-made">U</span>
                         <span class="step not-made">R'</span>
-                        <span class="step current-move">F</span>
-                        <!-- Wrong move indicator -->
-                        <span id="wrong-move" class="wrong-move" style="display:none;">Wrong move!</span>
+                        <span class="step not-made">F</span>
+                    </div>
+                    <div class="wrong-move-container">
+                        <div id="wrong-move" class="wrong-move">Wrong move!</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="timer">
-                <span id="timer">00:00.00</span>
             </div>
         </div>
 
