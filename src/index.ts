@@ -1,8 +1,8 @@
 import "./style.css";
 
-import $, { ajaxPrefilter, timers } from "jquery";
+import $ from "jquery";
 import * as THREE from "three";
-import { Subscription, interval, sample, lastValueFrom, last } from "rxjs";
+import { Subscription, interval } from "rxjs";
 import { TwistyPlayer } from "cubing/twisty";
 import { experimentalSolve3x3x3IgnoringCenters } from "cubing/search";
 import { Alg } from "cubing/alg";
@@ -11,7 +11,7 @@ import {
   patternToFacelets,
   oll_algs,
   pll_algs,
-} from "./utils";
+} from "./utils.js";
 import {
   now,
   connectGanCube,
@@ -190,16 +190,11 @@ async function updateCubeFaceOrientation(cubeQuaternion: THREE.Quaternion) {
         "CubefacesOrientation: " +
         cubeFacesOrientation
     );
-    // console.log(expectedFacesOrientation)
     if (
       cubeFacesOrientation.toString() == expectedFacesOrientation.toString()
     ) {
       console.log("Current orientation equals expected orientation");
       expectedFacesOrientation = null;
-    } else {
-      // console.log("Current orientation does not equal expected orientation")
-      // console.log("Current orientation: " + cubeFacesOrientation)
-      // console.log("Expected orientation: " + expectedFacesOrientation)
     }
   }
 }
@@ -281,16 +276,9 @@ async function checkMove(move: string) {
         `Not possible slice move: ${move} | currentAlgMove: ${currentAlgMove}`
       );
       addSolveRecord(false, move)
-      // populateSolutions(
-      //   `(${solutions.length + 1}) WRONG! [${currentAlgMoves
-      //     .slice(0, currentMoveIndex + 1)
-      //     .join(" ")}] + ${move}`
-      // );
       resetStates();
       displayAlgorithmSteps(currentAlg)
       showWrongMove(move)
-      // updateAlgDisplay();
-      // updateWrongAlgDisplay(move);
       return;
     }
 
@@ -329,19 +317,19 @@ async function checkMove(move: string) {
   checkAlgStateAfterMoveAndUpdate(move);
 }
 
-function convertToSeconds(timeStr) {
+function convertToSeconds(timeStr: string) : number {
   const [minutes, rest] = timeStr.split(':');
   const seconds = parseFloat(rest);
   return parseInt(minutes) * 60 + seconds;
 }
 
-function convertToTimeFormat(totalSeconds) {
+function convertToTimeFormat(totalSeconds: number) : string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = (totalSeconds % 60).toFixed(2);
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(5, '0')}`;
 }
 
-function findFastestAndMeanTimes(times) {
+function findFastestAndMeanTimes(times: string[]) {
   const timesInSeconds = times.map(convertToSeconds);
   
   const fastestTimeInSeconds = Math.min(...timesInSeconds);
@@ -370,10 +358,10 @@ function addSolveRecord(isCorrect: boolean, move: string) {
   solveList.prepend(listItem);
 
   let solves = [...solveList.childNodes].filter(x => x.nodeName.toLocaleLowerCase() == "li")
-  let correctSolves = solves.filter((x: HTMLElement) => x.className == "correct")
+  let correctSolves = solves.filter(x => (x as Element).className == "correct")
   console.log(correctSolves)
   console.log(correctSolves.map((solve) => solve.textContent))
-  let correctTimes = correctSolves.map((solve) => solve.textContent.split(" ")[1])
+  let correctTimes = correctSolves.map(solve => (solve as Element).innerHTML.split(" ")[1])
   console.log("correctTimes: ")
   console.log(correctTimes)
   const { fastestTime, meanTime } = findFastestAndMeanTimes(correctTimes);
@@ -386,15 +374,8 @@ function checkAlgStateAfterMoveAndUpdate(move: string) {
   if (move != currentAlgMoves[currentMoveIndex]) {
     console.log("FAILED ALG with move: " + move);
     addSolveRecord(false, move)
-    // populateSolutions(
-    //   `(${solutions.length + 1}) WRONG! [${currentAlgMoves
-    //     .slice(0, currentMoveIndex + 1)
-    //     .join(" ")}] + ${move}`
-    // );
     resetStates();
     showWrongMove(move)
-    // $("#alg-display-wrong").show();
-    // $("#alg-display-wrong").html(move);
     console.log(currentAlgMoves);
     console.log(currentMoveIndex);
     console.log(currentAlgMoves.slice(0, currentMoveIndex + 1));
@@ -402,9 +383,6 @@ function checkAlgStateAfterMoveAndUpdate(move: string) {
     console.log("FINISHED SUCCESSFULLY");
     resetStates();
     addSolveRecord(true, move)
-    // populateSolutions(
-    //   `(${solutions.length + 1}) CORRECT! ${$("#timer").html()}`
-    // );
   } else {
     currentMoveIndex = currentMoveIndex + 1;
     twistyPlayer.experimentalAddMove(move, { cancel: false });
@@ -412,7 +390,6 @@ function checkAlgStateAfterMoveAndUpdate(move: string) {
   }
 
   displayAlgorithmSteps(currentAlg!!)
-  // updateAlgDisplay();
 }
 
 function isPossibleCorrectSliceMove(
@@ -435,20 +412,12 @@ function isPossibleCorrectSliceMove(
 
 function updateWrongAlgDisplay(move: string | null) {
   showWrongMove(move)
-  // if (move != null) {
-  //   showWrongMove(move)
-  //   $("#alg-display-wrong").show();
-  //   $("#alg-display-wrong").html(move);
-  // } else {
-  //   showWrongMove(move)
-  //   $("#alg-display-wrong").hide();
-  //   $("#alg-display-wrong").html("");
-  // }
 }
 
 function resetStates() {
   lastMoves = [];
-  twistyPlayer.alg = new Alg(currentAlg).invert();
+  if (currentAlg)
+    twistyPlayer.alg = new Alg(currentAlg).invert();
   setTimerState("STOPPED");
   currentMoveIndex = 0;
   isAwaitingDoubleMove = false;
@@ -602,15 +571,6 @@ function getOrientationBasedOnMove(
 
   let result: string[] | null = [...orientation2];
 
-  // ["F", "B", "R", "L", "U", "D"]
-  //   0    1    2    3    4    5
-  // ["F", "B", "R", "L", "U", "D"] -> original
-  // ["U", "D", "R", "L", "B", "F"] -> M'
-  // ["D", "U", "R", "L", "U", "D"] -> M
-  // ["R", "L", "B", "F", "U", "D"] -> E
-  // ["L", "R", "F", "B", "U", "D"] -> E'
-  // ["F", "B", "D", "U", "R", "L"] -> S
-  // ["F", "B", "U", "F", "L", "R"] -> S'
   if (move == "M" || move == "r'" || move == "l" || move == "x'") {
     result[0] = orientation2[4]; // F -> U
     result[1] = orientation2[5]; // B -> D
@@ -670,95 +630,6 @@ function getOrientationBasedOnMove(
   return result;
 }
 
-// function updateExpectedCubeOrientation(move: string) {
-//   if (expectedFacesOrientation != null) {
-//     if (cubeFacesOrientation.toString() == expectedFacesOrientation.toString()) {
-//       console.log("expected alreay equals current cube face orientation")
-//       return
-//     }
-//   }
-//   let currentFacesOrientation =
-//     expectedFacesOrientation != null
-//       ? [...expectedFacesOrientation]
-//       : [...cubeFacesOrientation];
-
-//   let colors = ["green", "blue", "red", "orange", "white", "yellow"]
-//   let faces = ["F", "B", "R", "L", "U", "D"]
-
-//   let orientation2 = []
-//   for (let face of faces) {
-//     orientation2.push(colors[currentFacesOrientation.indexOf(face)])
-//   }
-
-//   let result: string[] | null = [...orientation2];
-
-//   // ["F", "B", "R", "L", "U", "D"]
-//   //   0    1    2    3    4    5
-//   // ["F", "B", "R", "L", "U", "D"] -> original
-//   // ["U", "D", "R", "L", "B", "F"] -> M'
-//   // ["D", "U", "R", "L", "U", "D"] -> M
-//   // ["R", "L", "B", "F", "U", "D"] -> E
-//   // ["L", "R", "F", "B", "U", "D"] -> E'
-//   // ["F", "B", "D", "U", "R", "L"] -> S
-//   // ["F", "B", "U", "F", "L", "R"] -> S'
-//   if (move == "M" || move == "r'" || move == "l'" || move == "x'") {
-//     result[0] = orientation2[4]; // F -> U
-//     result[1] = orientation2[5]; // B -> D
-//     result[4] = orientation2[1]; // U -> B
-//     result[5] = orientation2[0]; // D -> F
-//   } else if (move == "M'" || move == "r" || move == "l" || move ==  "x") {
-//     result[0] = orientation2[5]; // F -> D
-//     result[1] = orientation2[4]; // B -> U
-//     result[4] = orientation2[0]; // U -> F
-//     result[5] = orientation2[1]; // D -> B
-//   } else if (move == "E" || move == "d'" || move == "u" || move == "y'") {
-//     result[0] = orientation2[3]; // F -> L
-//     result[1] = orientation2[2]; // B -> R
-//     result[2] = orientation2[0]; // R -> F
-//     result[3] = orientation2[1]; // D -> B
-//   } else if (move == "E'" || move == "d" || move == "u'" || move == "y") {
-//     result[0] = orientation2[2]; // F -> R
-//     result[1] = orientation2[3]; // B -> L
-//     result[2] = orientation2[1]; // R -> B
-//     result[3] = orientation2[0]; // L -> F
-//   } else if (move == "S" || move == "f'" || move == "b" || move == "z") {
-//     result[2] = orientation2[4]; // R -> U
-//     result[3] = orientation2[5]; // L -> D
-//     result[4] = orientation2[3]; // U -> L
-//     result[5] = orientation2[2]; // D -> R
-//   } else if (move == "S'" || move == "f" || move == "b'" || move == "z'") {
-//     result[2] = orientation2[5]; // R -> D
-//     result[3] = orientation2[4]; // L -> U
-//     result[4] = orientation2[2]; // U -> R
-//     result[5] = orientation2[3]; // D -> L
-//   } else result = null;
-
-//   console.log(`updateExpectedCubeOrientation. SliceMove: ${move}`);
-//   console.log(`prientation2`);
-//   console.log(orientation2)
-//   console.log("cubeFacesOrientation:");
-//   console.log(cubeFacesOrientation);
-//   console.log("expectedFacesOrientation:");
-//   console.log(expectedFacesOrientation);
-//   console.log("currentFacesOrientation:");
-//   console.log(currentFacesOrientation);
-//   console.log("result: ");
-//   console.log(result);
-
-//   if (result != null) {
-//     let newCubeOrientation = []
-
-//     for (let color of colors) {
-//       newCubeOrientation.push(faces[result.indexOf(color)])
-//     }
-
-//     expectedFacesOrientation = [...newCubeOrientation]
-//     console.log("newCubeOrientation: ");
-//     console.log(newCubeOrientation);
-//   }
-//   else return null
-// }
-
 function updateExpectedCubeOrientation(move: string) {
   let result = getOrientationBasedOnMove(cubeFacesOrientation, move);
 
@@ -808,8 +679,6 @@ async function convertOrientationMove(move: string): Promise<string> {
       break;
     }
   }
-
-  // updateCubeFaceOrientation(cubeQuaternion);
 
   let orientedFace =
     expectedFacesOrientation != null
@@ -863,10 +732,9 @@ function handleCubeEvent(event: GanCubeEvent) {
   } else if (event.type == "DISCONNECT") {
     twistyPlayer.alg = "";
     $(".info input").val("- n/a -");
-    // $("#connect").html("Connect");
-    $("#connect-cube").textContent = "Connect Cube";
-    $("#connect-cube").classList.remove("disconnect");
-    $("#connect-cube").classList.add("connect");
+    $("#connect-cube").text("Connect Cube")
+    $("#connect-cube").removeClass("disconnect");
+    $("#connect-cube").addClass("connect");
   }
 }
 
@@ -911,7 +779,6 @@ $("#connect-cube").on("click", async () => {
     await conn.sendCubeCommand({ type: "REQUEST_HARDWARE" });
     await conn.sendCubeCommand({ type: "REQUEST_BATTERY" });
     await conn.sendCubeCommand({ type: "REQUEST_FACELETS" });
-    // $("#connect").html("Disconnect");
     connectButton.textContent = "Disconnect Cube";
     connectButton.classList.remove("connect");
     connectButton.classList.add("disconnect");
@@ -1009,26 +876,6 @@ $("#twisty-player").on("touchstart", () => {
   activateTimer();
 });
 
-let solutions: string[] = [];
-
-function populateSolutions(solution: string) {
-  console.log(solutions);
-  solutions.unshift(solution);
-  console.log(solutions);
-
-  const solutionsContent = document.getElementById("alg-solutions");
-  solutionsContent!!.innerHTML = ""; // Clear previous content
-
-  solutions.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.textContent = item;
-    div.dataset.id = index.toString();
-
-    // div.addEventListener('click', () => handleItemClick(item.name, item.alg));
-
-    solutionsContent!!.appendChild(div);
-  });
-}
 
 // Mock current algorithm name
 document.getElementById("current-alg-name")!.innerText = "Current Algorithm: OLL";
@@ -1097,17 +944,17 @@ function handleAlgTypeChange(value: string) {
 }
 
 function handleAlgSelection(algName: string, selectedDiv: HTMLElement) {
-  const notation = selectedDiv.dataset.notation;
-  currentAlg = notation!!
+  const notation = selectedDiv.dataset.notation!!;
+  currentAlg = notation
   document.getElementById("solves")!.innerHTML = ''
   updateSolveStats(0, 0, "--:--", "--:--", 0)
   resetStates()
   displayAlgorithmSteps(notation);
-  document.getElementById("current-alg-name").textContent = `Current Algorithm: ${algName}`;
+  document.getElementById("current-alg-name")!!.textContent = `Current Algorithm: ${algName}`;
 }
 
-function initCustomSelect(elementId: string, onChange: (value: string, selectedDiv?: HTMLElement) => void) {
-  const select = document.getElementById(elementId);
+function initCustomSelect(elementId: string, onChange: (value: string, selectedDiv: HTMLElement) => void) {
+  const select = document.getElementById(elementId)!!;
   const selected = select.querySelector(".select-selected") as HTMLElement;
   const optionsContainer = select.querySelector(".select-items") as HTMLElement;
   const mainArea = document.getElementsByClassName("main-area")[0] as HTMLElement;
@@ -1121,10 +968,10 @@ function initCustomSelect(elementId: string, onChange: (value: string, selectedD
   });
 
   optionsContainer.querySelectorAll("div").forEach((optionDiv) => {
-      optionDiv.addEventListener("click", (e) => {
+      optionDiv.addEventListener("click", _ => {
           const value = optionDiv.dataset.value || optionDiv.textContent;
           selected.textContent = optionDiv.textContent;
-          onChange(value, optionDiv);
+          onChange(value!!, optionDiv);
           optionsContainer.classList.add("select-hide");
           selected.classList.remove("select-arrow-active"); 
       });
@@ -1133,6 +980,7 @@ function initCustomSelect(elementId: string, onChange: (value: string, selectedD
 
 // Function to close all select boxes except the current one
 function closeAllSelect(current?: HTMLElement) {
+  console.log(current)
   const selects = document.querySelectorAll(".select-items");
   const selecteds = document.querySelectorAll(".select-selected");
   selects.forEach((select) => {
@@ -1147,8 +995,13 @@ function closeAllSelect(current?: HTMLElement) {
   });
 }
 
+function closeAllSelectCallback(event: MouseEvent) {
+  const current = event?.target as HTMLElement;
+  closeAllSelect(current)
+}
+
 // Close all selects when clicking outside
-document.addEventListener("click", closeAllSelect);
+document.addEventListener("click", closeAllSelectCallback);
 
 // Function to display algorithm steps
 function displayAlgorithmSteps(notation: string) {
@@ -1167,56 +1020,6 @@ function displayAlgorithmSteps(notation: string) {
       algStepsContainer.appendChild(stepSpan);
   });
 }
-// // Function to dynamically populate the dropdown menu
-// function populateDropdown(id: string, items: any[]) {
-//   const dropdownContent = document.getElementById(id);
-//   dropdownContent!!.innerHTML = ""; // Clear previous content
-
-//   items.forEach((item) => {
-//     const div = document.createElement("div");
-//     div.textContent = item.name;
-//     div.dataset.id = item.name; // Store item ID for reference
-//     div.className = "dropdown-item"
-
-//     // Add a click event listener to each dropdown item
-//     div.addEventListener("click", () => handleItemClick(item.name, item.alg));
-
-//     dropdownContent!!.appendChild(div);
-//   });
-// }
-
-// function handleItemClick(name: any, alg: string | null) {
-//   currentAlg = alg;
-//   $("#alg-display").html(alg);
-//   $("#alg-display").show();
-//   $("#alg-name").html(name);
-//   solutions = [];
-//   resetStates();
-//   updateAlgDisplay();
-// }
-
-// function updateAlgDisplay() {
-//   const element = document.getElementById("alg-display")!!;
-//   const text = element.textContent!!;
-//   const letters = text.split(" "); // Split text into individual characters
-
-//   element.innerHTML = ""; // Clear original content
-
-//   letters.forEach((letter, index) => {
-//     const span = document.createElement("span");
-
-//     if (index == currentMoveIndex) span.className = "currentMove";
-//     else if (index < currentMoveIndex) span.className = "correctMove";
-//     else if (index > currentMoveIndex) span.className = "futureMove";
-//     span.textContent = letter + " ";
-//     element.appendChild(span);
-//   });
-// }
-
-// // Populate the dropdown when the page loads
-// populateDropdown("dropdown-content-OLL", oll_algs);
-
-// populateDropdown("dropdown-content-PLL", pll_algs);
 
 function showWrongMove(move: string | null) {
   const wrongMoveElement = document.getElementById("wrong-move")!;
