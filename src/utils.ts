@@ -201,6 +201,54 @@ function faceletsToPattern(facelets: string): KPattern {
 
 }
 
+function isRotateMove(move: string) {
+  return ["x", "y", "z"].some((char) => move.includes(char));
+}
+
+
+function isDoubleMove(move: string) {
+  return [
+    "R2",
+    "R2'",
+    "L2",
+    "L2'",
+    "U2",
+    "U2'",
+    "D2",
+    "D2'",
+    "B2",
+    "B2'",
+    "F2",
+    "F2'",
+    "M2",
+    "M2'",
+    "E2",
+    "E2'",
+    "S2",
+    "S2'",
+    "r2",
+    "r2'",
+    "l2",
+    "l2'",
+    "u2",
+    "u2'",
+    "d2",
+    "d2'",
+    "b2",
+    "b2'",
+    "f2",
+    "f2'",
+  ].includes(move);
+}
+
+function isSliceMove(move: string) {
+  return ["M", "E", "S"].some((char) => move.includes(char));
+}
+
+function isWideMove(move: string) {
+  return ["f", "b", "r", "l", "u", "d"].some((char) => move.includes(char));
+}
+
 
 let oll_algs = [
   { name: 'SLICE-TESTER', alg: "U S U S'"},
@@ -293,6 +341,10 @@ let pll_algs = [
 export {
   patternToFacelets,
   faceletsToPattern,
+  isRotateMove,
+  isDoubleMove,
+  isSliceMove,
+  isWideMove,
   oll_algs,
   pll_algs
 }
